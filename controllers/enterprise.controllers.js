@@ -68,7 +68,15 @@ function updateEnterprise (req, res){
     var enterpriseId = req.params.id;
     var update = req.body;
 
-    
+    Enterprise.findByIdAndUpdate(enterpriseId, update, {new: true}, (err, enterpriseUpdated)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(enterpriseUpdated){
+            res.send({enterprise: enterpriseUpdated});
+        }else{
+            res.status(404).send({message: 'No se pudo actualizar el registro'});
+        }
+    })
 }
 
 
