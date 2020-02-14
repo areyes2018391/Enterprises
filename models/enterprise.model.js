@@ -7,7 +7,8 @@ var enterpriseSchema = Schema({
     name: String,
     phone: Number,
     email: String,
-    address: String
+    address: String,
+    employees: []
 });
 
 module.exports =mongoose.model('enterprise', enterpriseSchema);

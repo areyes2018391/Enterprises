@@ -1,7 +1,7 @@
 'use strict'
 
 var express = require('express');
-var enterpriseController = require('../controllers/enterprise.controllers');
+var enterpriseController = require('../controllers/enterprise.controller');
 var api = express();
 
 api.post('/saveEnterprise', enterpriseController.saveEnterprise);

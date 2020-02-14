@@ -4,6 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var enterpriseRoutes = require('./routes/enterprise.route');
+var employeeRoutes = require('./routes/employee.route');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -16,6 +17,6 @@ app.use((req, res, next) => {
 	next();
 });
 
-app.use('/control', enterpriseRoutes);
+app.use('/control', enterpriseRoutes, employeeRoutes);
 
 module.exports = app;
