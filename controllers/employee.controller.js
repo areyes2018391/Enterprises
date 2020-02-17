@@ -87,12 +87,11 @@ function findEmployee (req, res){
 
     Employee.find({$or: [{'name': {$regex: text, $options: 'i'}}, {'email': {$regex: text, $options: 'i'}}, {'charge': {$regex: text, $options: 'i'}}, {'department': {$regex: text, $options: 'i'}}]}, (err, employees) => {
         if (err) {
-            res.status(500).send({message: 'Error en el servidor'});
-            console.log(err);
+            res.status(500).send({message: 'Error en el servidor', err});
         } else if (employees) {
             res.status(200).send({Empleados: employees})
         } else {
-            res.status(200).send({message: 'No hay empleados'});
+            res.status(404).send({message: 'No hay empleados'});
         }
     });
 }
