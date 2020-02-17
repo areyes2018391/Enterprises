@@ -82,9 +82,37 @@ function updateEmployee(req, res) {
     })
 }
 
+function findEmployee (req, res){
+    var text = req.body.search;
+
+    Employee.find({$or: [{'name': {$regex: text, $options: 'i'}}, {'email': {$regex: text, $options: 'i'}}, {'charge': {$regex: text, $options: 'i'}}, {'department': {$regex: text, $options: 'i'}}]}, (err, employees) => {
+        if (err) {
+            res.status(500).send({message: 'Error en el servidor'});
+            console.log(err);
+        } else if (employees) {
+            res.status(200).send({Empleados: employees})
+        } else {
+            res.status(200).send({message: 'No hay empleados'});
+        }
+    });
+}
+
+function employeesTotal(req, res){
+    Employee.find({}, (err, employees)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(employees){
+            res.send({employees: employees.length});
+        }else{
+            res.status(404).send({message: 'No se encontró ningun empleado'})
+        }
+    })
+}
 module.exports = {
     saveEmployee,
     listEmployees,
     deleteEmployee,
-    updateEmployee
+    updateEmployee,
+    findEmployee,
+    employeesTotal
 }
