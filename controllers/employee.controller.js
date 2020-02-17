@@ -83,8 +83,24 @@ function updateEmployee(req, res) {
 }
 
 function findEmployee (req, res){
+    var employeeid = req.params.id;
     var text = req.body.search;
 
+    if(employeeid){
+        Employee.findById(employeeId, (err, employees)=>{
+            if(err){
+                res.status(500).send({message: 'Error en el servidor'});
+
+            }else if(employees){
+                res.send({empleados: employees})
+
+            }else{
+                res.send({message: 'no se encontró'})
+            }
+        })
+    
+
+    }else{
     Employee.find({$or: [{'name': {$regex: text, $options: 'i'}},
      {'email': {$regex: text, $options: 'i'}}, 
      {'charge': {$regex: text, $options: 'i'}}, 
@@ -97,6 +113,7 @@ function findEmployee (req, res){
             res.status(404).send({message: 'No hay empleados'});
         }
     });
+}
 }
 
 function employeesTotal(req, res){
