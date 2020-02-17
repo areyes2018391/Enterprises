@@ -85,7 +85,10 @@ function updateEmployee(req, res) {
 function findEmployee (req, res){
     var text = req.body.search;
 
-    Employee.find({$or: [{'name': {$regex: text, $options: 'i'}}, {'email': {$regex: text, $options: 'i'}}, {'charge': {$regex: text, $options: 'i'}}, {'department': {$regex: text, $options: 'i'}}]}, (err, employees) => {
+    Employee.find({$or: [{'name': {$regex: text, $options: 'i'}},
+     {'email': {$regex: text, $options: 'i'}}, 
+     {'charge': {$regex: text, $options: 'i'}}, 
+     {'department': {$regex: text, $options: 'i'}}]}, (err, employees) => {
         if (err) {
             res.status(500).send({message: 'Error en el servidor', err});
         } else if (employees) {
