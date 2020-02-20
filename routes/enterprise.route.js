@@ -8,5 +8,8 @@ api.post('/saveEnterprise', enterpriseController.saveEnterprise);
 api.get('/listEnterprises', enterpriseController.listEnterprises);
 api.delete('/deleteEnterprise/:id', enterpriseController.deleteEnterprise);
 api.put('/updateEnterprise/:id', enterpriseController.updateEnterprise);
+api.post('/addEmployee/:idEmpresa', enterpriseController.addEmployee);
+api.put('/updateEmployee/:idEn/:idEm', enterpriseController.updateEmployee);
+api.delete('/removeEmployee/:idEn/:idEm', enterpriseController.removeEmployee);
 
 module.exports = api;
