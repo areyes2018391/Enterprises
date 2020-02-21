@@ -9,6 +9,6 @@ api.get('/listEmployees', employeeController.listEmployees);
 api.delete('/deleteEmployee/:id', employeeController.deleteEmployee);
 api.put('/updateEmployee/:id', employeeController.updateEmployee)
 api.get('/findEmployee',employeeController.findEmployee);
-api.get('/employeesTotal/:id', employeeController.employeesTotal);
+api.get('/employeesTotal/', employeeController.employeesTotal);
 
 module.exports = api;

@@ -11,5 +11,6 @@ api.put('/updateEnterprise/:id', enterpriseController.updateEnterprise);
 api.post('/addEmployee/:idEmpresa', enterpriseController.addEmployee);
 api.put('/updateEmployee/:idEn/:idEm', enterpriseController.updateEmployee);
 api.delete('/removeEmployee/:idEn/:idEm', enterpriseController.removeEmployee);
+api.get('/employeesTotal/:id', enterpriseController.employeesTotal);
 
 module.exports = api;

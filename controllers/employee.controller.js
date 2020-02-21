@@ -127,6 +127,7 @@ function employeesTotal(req, res){
         }
     })
 }
+
 module.exports = {
     saveEmployee,
     listEmployees,

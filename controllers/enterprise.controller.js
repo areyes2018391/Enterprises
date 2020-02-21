@@ -144,7 +144,8 @@ function addEmployee(req,res){
 
 function removeEmployee(req, res){
     const enterpriseId = req.params.idEn;
-    let employeeId = req.params.idEm;
+    var employeeId = req.params.idEm;
+    var employee = Employee();
 
     Enterprise.findById(enterpriseId,(err, enterpriseFind)=>{ 
         if(err){
@@ -158,7 +159,7 @@ function removeEmployee(req, res){
         
                 }else if(employeeDeleted){
         
-                    Enterprise.findOneAndUpdate({_id:enterpiseId,"employees._id":employeeId},{$pull:{employees:{employee}}}, {new:true}, (err, employeeRemoved)=>{
+                    Enterprise.findOneAndUpdate({_id:enterpriseId,"employees._id":employeeId},{$pull:{employees:{employee}}}, {new:true}, (err, employeeRemoved)=>{
 
                 if(err){
                     res.status(500).send({message: 'Error en el servidor'});
@@ -208,6 +209,20 @@ function updateEmployee(req, res){
         }
     });
 }
+
+function employeesTotal(req, res){
+    const enterpriseId = req.params.id;
+
+    Enterprise.findById(enterpriseId, (err, employeesT)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(employeesT){
+            res.send({Enterprise: employeesT.name, Employees: employeesT.employees.length});
+        }else{
+            res.status(404).send({message: 'No se encontró ningun empleado'})
+        }
+    })
+}
 module.exports ={
     saveEnterprise,
     listEnterprises,
@@ -215,5 +230,6 @@ module.exports ={
     updateEnterprise,
     addEmployee,
     updateEmployee,
-    removeEmployee
+    removeEmployee,
+    employeesTotal
 }
