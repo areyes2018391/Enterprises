@@ -158,7 +158,7 @@ function removeEmployee(req, res){
         
                 }else if(employeeDeleted){
         
-                    Enterprise.findOneAndUpdate({employeeId},{$pull:{employees:{employee}}}, {new:true}, (err, employeeRemoved)=>{
+                    Enterprise.findOneAndUpdate({_id:enterpiseId,"employees._id":employeeId},{$pull:{employees:{employee}}}, {new:true}, (err, employeeRemoved)=>{
 
                 if(err){
                     res.status(500).send({message: 'Error en el servidor'});
