@@ -8,6 +8,6 @@ var employeeSchema = Schema ({
     department: String,
     phoneNumber: Number,
     email: String
-})
+});
 
 module.exports = mongoose.model('employee', employeeSchema);
