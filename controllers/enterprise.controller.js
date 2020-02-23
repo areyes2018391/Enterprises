@@ -81,101 +81,79 @@ function updateEnterprise (req, res){
 }
 
 function addEmployee(req,res){
-    var idEmpresa = req.params.idEmpresa;
+    var enterpriseId = req.params.id;
     var params = req.body;
     var employee = new Employee();
 
-	Enterprise.findById(idEmpresa,(err,enterpriseFind)=>{
-        if(err){
-            res.status(500).send({message:'Error en el servidor'});
-        }else if(enterpriseFind){
+    if(params.name && params.email){
+        Enterprise.findById(enterpriseId, (err, enterpriseFind)=>{
+            if(err){
+                res.status(500).send({message: 'Error en el servidor'});
 
-            if(params.name && params.email &&
-                params.charge && params.phoneNumber
-                 && params.department){
-         
-                     Employee.findOne({name:params.name}, (err,employeeFind)=>{
-                                          if(err){
-                                              res.status(500).send({message:'Error en el servidor'});
-                                          }else if(employeeFind){
-                                              res.send({message:'Empleado ya agregado.'});
-                                          }else{
-                                            employee.name = params.name;
-                                            employee.charge = params.charge;
-                                            employee.phoneNumber = params.phoneNumber;
-                                            employee.email = params.email;
-                                            employee.department = params.department
-         
-                                            employee.save((err,employeeSaved)=>{
-                                                  if(err){
-                                                      res.status(500).send({message:'Error'});
+            }else if(enterpriseFind){
 
-                                                  }else if(employeeSaved){
-                                                        Enterprise.findByIdAndUpdate(idEmpresa,{$push:{employees:employee}},{new:true}, (err,employeeSaved)=>{
-                                                            if(err){
-                                                                res.status(500).send({message:'Error en el servidor'});
-                                                            }else if(employeeSaved){
-                                                                res.send({message:'Empleado agregado'});
-                                                                res.send({employee: employeeSaved});
-                                                            }else{
-                                                                res.status(200).send({message: 'Error al agregar empleado.'});
-                                                            }
-                                                        });
-                                                        
-                                                  }else{
-                                                      res.status(200).send({message:'No se pudo agregar el empleado.'});
-                                                  }
-                                              });
-                                              
-                                          }
-                                    });
-         
+               Employee.findOne({name: params.name}, (err, employeeFind)=>{
+                   if(err){
+                    res.status(500).send({message: 'Error en el servidor'});
+                   }else if(employeeFind){
+                    res.send({message: 'Empleado ya existente'});
+                   }else{
+                    employee.name = params.name;
+                    employee.email = params.email;
+                    employee.charge  = params.charge ;
+                    employee.phoneNumber = params.phoneNumber;
+                    employee.department = params.department;
+    
+                    employee.save((err, employeesSaved)=>{
+                        if(err){
+                            res.status(500).send({message: 'Error en el servidor'});
+                        }else if(employeesSaved){
+                            Enterprise.findByIdAndUpdate(enterpriseId, {$push: {employees: employee}}, {new: true}, (err, enterpriseUpdated)=>{
+                                if(err){
+                                    res.status(500).send({message: 'Error en el servidor'});
+                                }else if(enterpriseUpdated){
+                                    res.send({enterprise: enterpriseUpdated});
+                                }else{
+                                    res.status(418).send({message: 'Error al actualizar la empresa'});
+                                }
+                            })
+                        }else{
+                            res.status(418).send({message: 'No se pudo agregar el empleado'})
+                        }
+                    })
+                   }
+               })
             }else{
-                res.send({message:'faltan datos'});
+                res.status(418).send({message: 'Empresa no encontrada'});
             }
-        }else{
-            res.send({message:'id de empresa incorrecto.'});
-        }
-    });
-
+        })
+    }else{
+        res.send({message: 'Faltan datos por ingresar'});
+    }
 }
 
 
 
 function removeEmployee(req, res){
-    const enterpriseId = req.params.idEn;
-    var employeeId = req.params.idEm;
-    var employee = Employee();
+    let  enterpriseId = req.params.idEn;
+    let employeeId = req.params.idEm;
 
-    Enterprise.findById(enterpriseId,(err, enterpriseFind)=>{ 
+    Enterprise.findOneAndUpdate({_id:enterpriseId, "employees._id":employeeId}, {$pull:{employees:{_id:employeeId}}}, {new: true}, (err, employeeRemoved)=>{
         if(err){
             res.status(500).send({message: 'Error en el servidor'});
-        }else if(enterpriseFind){
-
-            Employee.findByIdAndDelete(employeeId,(err, employeeDeleted)=>{
-                
-                if(err){
+        }else if(employeeRemoved){
+            Employee.findByIdAndDelete(employeeId, (err, employeeDeleted)=>{
+                if(err){    
                     res.status(500).send({message: 'Error en el servidor'});
-        
                 }else if(employeeDeleted){
-        
-                    Enterprise.findOneAndUpdate({_id:enterpriseId,"employees._id":employeeId},{$pull:{employees:{employee}}}, {new:true}, (err, employeeRemoved)=>{
-
-                if(err){
-                    res.status(500).send({message: 'Error en el servidor'});
-                }else if(employeeRemoved){
-                    res.send({message: 'Empleado eliminado'});
+                    res.send({message: 'Empleado eliminado'})
                 }else{
-                    res.status(418).send({message: 'Empleado no eliminado',err});
+                    res.status(404).send({message: 'No se pudo eliminar el empleado'});
                 }
-            });
-                }else{
-                    res.send({message: 'No se pudo eliminar el empleado', err})
-                } 
             })
-        
         }else{
-            res.send({message: 'No se pudo encontrar la empresa'})
+            res.status(404).send({message: 'No se pudo eliminar el empleado de la empresa'});
+            console.log(err);
         }
     })
 }
