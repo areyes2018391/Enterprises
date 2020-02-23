@@ -165,25 +165,33 @@ function updateEmployee(req, res){
 
     Enterprise.findById(enterpriseId, (err, enterpriseOk)=>{
         if(err){
-            res.status(500).send({message: 'Error general'});
+            res.status(500).send({message: 'Error en el servidor'});
         }else if(enterpriseOk){
-            Enterprise.findOneAndUpdate({enterpriseId, "employee._id":employeeId}, 
-            {"employee.$.name": params.name,
-            "employee.$.email": params.email,
-            "employee.$.phoneNumber": params.phoneNumber,
-            "employee.$.charge": params.charge,
-            "employee.$.department": params.departament },{new:true}, (err, enterpriseUpdated)=>{
-                if(err){
-                    res.status(500).send({message: 'Error general'});
-                }else if(enterpriseUpdated){
-                    res.send({enterprise: enterpriseUpdated});
-                }else{
-                    res.status(418).send({message: 'No se pudo actualizar el empleado'});
+           Employee.findByIdAndUpdate(employeeId, params,(err, employeeUpdated)=>{
+               if(err){
+                res.status(500).status({message: 'Error en el servidor'});
+               }else if(employeeUpdated){
+                Enterprise.findOneAndUpdate({_id:enterpriseId, "employees._id":employeeId}, 
+                {"employees.$.name": params.name,
+                "employees.$.email": params.email,
+                "employees.$.phoneNumber": params.phoneNumber,
+                "employees.$.charge": params.charge,
+                "employees.$.department": params.department },{new:true}, (err, enterpriseUpdated)=>{
+                    if(err){
+                        res.status(500).send({message: 'Error en el servidor'});
+                    }else if(enterpriseUpdated){
+                        res.send({enterprise: enterpriseUpdated});
+                    }else{
+                        res.status(418).send({message: 'No se pudo actualizar la empresa'});
+                    }
                 }
-            }
-            );
+                );
+               }else{
+                res.status(418).send({message: 'No se pudo actualizar el empleado'});
+               }
+           })
         }else{
-            res.status(418).send({message: 'No existe el empleado'});
+            res.status(418).send({message: 'No se encontró la empresa'});
         }
     });
 }
