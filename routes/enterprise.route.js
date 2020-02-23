@@ -8,9 +8,11 @@ api.post('/saveEnterprise', enterpriseController.saveEnterprise);
 api.get('/listEnterprises', enterpriseController.listEnterprises);
 api.delete('/deleteEnterprise/:id', enterpriseController.deleteEnterprise);
 api.put('/updateEnterprise/:id', enterpriseController.updateEnterprise);
-api.post('/addEmployee/:idEmpresa', enterpriseController.addEmployee);
-api.put('/updateEmployee/:idEn/:idEm', enterpriseController.updateEmployee);
-api.delete('/removeEmployee/:idEn/:idEm', enterpriseController.removeEmployee);
+
+//Employees URI's
+api.put('/:id/addEmployee', enterpriseController.addEmployee);
+api.put('/:idEn/removeEmployee/:idEm', enterpriseController.removeEmployee);
+api.put('/:idEn//updateEmployee/:idEm', enterpriseController.updateEmployee);
 api.get('/employeesTotal/:id', enterpriseController.employeesTotal);
 
 module.exports = api;
