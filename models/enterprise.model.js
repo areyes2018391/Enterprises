@@ -1,5 +1,4 @@
 'use strict'
-
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
@@ -8,7 +7,12 @@ var enterpriseSchema = Schema({
     phone: Number,
     email: String,
     address: String,
-    employees: []
+    
+    employees: [{name: String,
+        charge : String,
+        department: String,
+        phoneNumber: Number,
+        email: String}]
 });
 
-module.exports =mongoose.model('enterprise', enterpriseSchema);
+module.exports = mongoose.model('enterprise', enterpriseSchema);
