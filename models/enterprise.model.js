@@ -9,7 +9,11 @@ var enterpriseSchema = Schema({
     address: String,
     username: String,
     password: String,
-    enterpriseProducts: String,
+
+    products: [{
+        name: String,
+        quantity: Number,
+    }],
 
     employees: [{name: String,
         charge : String,
@@ -17,7 +21,18 @@ var enterpriseSchema = Schema({
         phoneNumber: Number,
         email: String}],
 
-    branches:[]
+    branches:[{
+        branchName: String,
+        branchPhone: Number,
+        branchAddress: String,
+        
+        branchProducts: [{
+            name: String,
+            quantity: Number
+        }] 
+    }]
+
+
 });
 
 module.exports = mongoose.model('enterprise', enterpriseSchema);

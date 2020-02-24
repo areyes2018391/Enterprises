@@ -281,6 +281,12 @@ function pruebaMiddleWare(req, res){
     res.send({message: 'Middleware funcionando', req: enterprise})
 }
 
+function addBranch(req, res){
+    var enterpriseId = req.params.id;
+
+    
+}
+
 
 
 module.exports ={
