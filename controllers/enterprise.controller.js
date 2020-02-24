@@ -2,6 +2,10 @@
 
 var Enterprise = require('../models/enterprise.model');
 var Employee = require('../models/employee.model');
+var bcrypt = require('bcrypt-nodejs');
+var jwt = require('../services/jwt');
+var fs = require('fs');
+var path = require('path');
  
 function saveEnterprise(req, res ){
     var params = req.body;
@@ -11,25 +15,34 @@ function saveEnterprise(req, res ){
         params.email &&
         params.address &&
         params.phone){
-            Enterprise.findOne({name: params.name}, (err, enterpriseFind)=>{
+            Enterprise.findOne({$or:[{username: params.username},{email: params.email}, {phoneNumber: params.phone}]}, (err, enterpriseFind)=>{
                 if(err){
                     res.status(500).send({message: 'Error en el servidor'});
-                    console.log(err);
                 }else if (enterpriseFind){
-                    res.send({message: 'Nombre de empresa ya usado'});
+                    res.send({message: 'Datos de la empresa ya usados'});
                 }else{
                    enterprise.name =params.name;
                    enterprise.phone = params.phone;
                    enterprise.email = params.email;
                    enterprise.address = params.address;
+                   enterprise.password = params.password;
+                   enterprise.username = params.username;
 
-                   enterprise.save(enterprise, (err, enterpriseSaved)=>{
+                   bcrypt.hash(params.password, null, null, (err, hashPassword)=>{
                        if(err){
-                        res.status(500).send({message: 'Error en el servidor'});
-                       }else if(enterpriseSaved){
-                        res.send({enterprise: enterpriseSaved});
+                        res.status(500).send({message: 'Error de encriptación'});
                        }else{
-                        res.send({message: 'No se pudo guardar la empresa'});
+                        
+                        enterprise.password = hashPassword;
+                        enterprise.save(enterprise, (err, enterpriseSaved)=>{
+                            if(err){
+                             res.status(500).send({message: 'Error en el servidor'});
+                            }else if(enterpriseSaved){
+                             res.send({enterprise: enterpriseSaved});
+                            }else{
+                             res.send({message: 'No se pudo guardar la empresa'});
+                            }
+                        })
                        }
                    })
                 }
@@ -54,6 +67,9 @@ function listEnterprises(req, res){
 function deleteEnterprise(req, res){
     var enterpriseId = req.params.id;
 
+if(enterpriseId != req.enterprise.sub){
+    res.status(403).send({message: 'Error de permisos, usuario no logueado'});
+}else{
     Enterprise.findByIdAndDelete(enterpriseId, (err, enterpriseDeleted)=>{
         if(err){
             res.status(500).send({message: 'Error en el servidor'});
@@ -64,20 +80,31 @@ function deleteEnterprise(req, res){
         }
     })
 }
+}
 
 function updateEnterprise (req, res){
     var enterpriseId = req.params.id;
     var update = req.body;
 
-    Enterprise.findByIdAndUpdate(enterpriseId, update, {new: true}, (err, enterpriseUpdated)=>{
+    Enterprise.findOne({$or:[{username: update.username},{email: update.email}, {phoneNumber: update.phone}]},  (err, enterpriseFind)=>{
         if(err){
             res.status(500).send({message: 'Error en el servidor'});
-        }else if(enterpriseUpdated){
-            res.send({enterprise: enterpriseUpdated});
+        }else if(enterpriseFind){
+            res.status(418).send({message: 'La empresa ya existe'});
+
         }else{
-            res.status(404).send({message: 'No se pudo actualizar el registro'});
+            Enterprise.findByIdAndUpdate(enterpriseId, update, {new: true}, (err, enterpriseUpdated)=>{
+                if(err){
+                    res.status(500).send({message: 'Error en el servidor'});
+                }else if(enterpriseUpdated){
+                    res.send({enterprise: enterpriseUpdated});
+                }else{
+                    res.status(404).send({message: 'No se pudo actualizar el registro'});
+                }
+            })
         }
     })
+
 }
 
 function addEmployee(req,res){
@@ -209,6 +236,53 @@ function employeesTotal(req, res){
         }
     })
 }
+
+function login (req, res){
+    var params = req.body;
+
+    if(params.username || params.email){
+        if(params.password){
+            Enterprise.findOne({$or:[{username: params.username},{email: params.email}]} , (err, enterpriseFind)=>{
+                if(err){
+                    res.status(500).send({message: 'Error en el servidor'});
+
+                }else if(enterpriseFind){
+                    bcrypt.compare(params.password, enterpriseFind.password, (err, checkPassword)=>{
+                        if(err){
+                            res.status(500).send({message: ' error al comparar las contraseñas'});
+
+                        }else if(checkPassword){
+                            if(params.gettoken){
+                               res.send({token: jwt.createToken(enterpriseFind)});
+                            }
+                            else{
+                                res.send({enterprise: enterpriseFind});
+                            }
+
+                        }else{
+                            res.status(401).send({message: 'Contraseña incorrecta'});
+                        }
+                    })
+                }else{
+                    res.send({message: 'No se encontró la empresa'})
+                }
+            })
+        }else{
+            res.send({message: 'Por favor ingrese la contraseña'})
+        }
+    }else{
+        res.send({message:'Ingrese el nombre de usuario o correo'});  
+    }
+
+}
+
+function pruebaMiddleWare(req, res){
+    var enterprise = req.enterprise;
+    res.send({message: 'Middleware funcionando', req: enterprise})
+}
+
+
+
 module.exports ={
     saveEnterprise,
     listEnterprises,
@@ -217,5 +291,7 @@ module.exports ={
     addEmployee,
     updateEmployee,
     removeEmployee,
-    employeesTotal
+    employeesTotal,
+    login,
+    pruebaMiddleWare
 }

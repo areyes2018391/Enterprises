@@ -7,12 +7,17 @@ var enterpriseSchema = Schema({
     phone: Number,
     email: String,
     address: String,
-    
+    username: String,
+    password: String,
+    enterpriseProducts: String,
+
     employees: [{name: String,
         charge : String,
         department: String,
         phoneNumber: Number,
-        email: String}]
+        email: String}],
+
+    branches:[]
 });
 
 module.exports = mongoose.model('enterprise', enterpriseSchema);
