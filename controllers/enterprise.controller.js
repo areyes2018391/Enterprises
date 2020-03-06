@@ -452,23 +452,55 @@ function addProduct(req, res){
 
 } 
 
+function removeProduct(req, res){
+    let  enterpriseId = req.params.idEn;
+    let productId = req.params.idPr;
+
+    Enterprise.findOneAndUpdate({_id:enterpriseId, "products._id":productId}, {$pull:{products:{_id:productId}}}, {new: true}, (err, productRemoved)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(productRemoved){
+            Enterprise.findOneAndUpdate({_id:enterpriseId, "products._id":productId}, {$pull: {branches:{products:{_id:productId}}}}, {new: true}, (err, branchRemoved)=>{
+                if(err){
+                    res.status(500).send({message: 'Error en el servidor'});
+                }else if(branchRemoved){
+                    Product.findByIdAndDelete(productId, (err, productDeleted)=>{
+                        if(err){    
+                            res.status(500).send({message: 'Error en el servidor'});
+                        }else if(productDeleted){
+                            res.send({message: 'Producto eliminado'})
+                        }else{
+                            res.status(404).send({message: 'No se pudo eliminar el producto'});
+                        }
+                    })
+                }else{
+                    res.send({message: 'No se pudo eliminar'});
+                    console.log(err);
+                }
+            })
+        }else{
+            res.status(404).send({message: 'No se pudo eliminar el producto de la empresa'});
+            console.log(err);
+        }
+    })
+}
+
 function updateProduct(req, res){
     const enterpriseId = req.params.idEn;
-    var branchId = req.params.idBr;
+    var productId = req.params.idPr;
     var params = req.body;
 
     Enterprise.findById(enterpriseId, (err, enterpriseOk)=>{
         if(err){
             res.status(500).send({message: 'Error en el servidor'});
         }else if(enterpriseOk){
-           Branch.findByIdAndUpdate(branchId, params,(err, branchUpdated)=>{
+           Product.findByIdAndUpdate(productId, params,(err, productUpdated)=>{
                if(err){
                 res.status(500).status({message: 'Error en el servidor'});
-               }else if(branchUpdated){
-                Enterprise.findOneAndUpdate({_id:enterpriseId, "branches._id":branchId}, 
-                {"branches.$.branchName": params.branchName,
-                "branches.$.branchPhone": params.branchPhone,
-                "branches.$.branchAddress": params.branchAddress },{new:true}, (err, enterpriseUpdated)=>{
+               }else if(productUpdated){
+                Enterprise.findOneAndUpdate({_id:enterpriseId, "products._id":productId}, 
+                {"products.$.name": params.branchName,
+                "products.$.quantity": params.branchAddress },{new:true}, (err, enterpriseUpdated)=>{
                     if(err){
                         res.status(500).send({message: 'Error en el servidor'});
                     }else if(enterpriseUpdated){
@@ -488,6 +520,31 @@ function updateProduct(req, res){
     });
 }
 
+function stockProduct(req, res){
+    const enterpriseId = req.params.id;
+
+    Enterprise.findById(enterpriseId, (err, stockT)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(stockT){
+            res.send({Enterprise: stockT.name, Products: stockT.products.length});
+        }else{
+            res.status(404).send({message: 'No se encontró ningun empleado'})
+        }
+    })  
+}
+function searchProduct (req, res){
+    var enterpriseId = req.params.id;
+    var params = req.body;
+
+    Product.find({$or:[{quantity:params.quantity}, {name:params.name}]}, (err, productFind)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(productFind){
+            res.send({productos: productFind});
+        }
+    })
+}
 
 
 module.exports ={
@@ -505,5 +562,8 @@ module.exports ={
     removeBranch,
     updateBranch,
     addProduct,
-    updateProduct
+    updateProduct,
+    removeProduct,
+    stockProduct,
+    searchProduct
 }

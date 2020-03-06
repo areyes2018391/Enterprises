@@ -25,6 +25,12 @@ var enterpriseSchema = Schema({
         branchName: String,
         branchPhone: Number,
         branchAddress: String,
+
+        products:[
+            {name: String,
+                quantity: Number
+            }
+        ]
         
          
     }]
