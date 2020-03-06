@@ -8,7 +8,7 @@ var connectMultiparty = require('connect-multiparty');
 
 
 api.post('/saveEnterprise', enterpriseController.saveEnterprise);
-api.get('/listEnterprises', middlewareAuth.ensureAuth, enterpriseController.listEnterprises);
+api.get('/listEnterprises', enterpriseController.listEnterprises);
 api.delete('/deleteEnterprise/:id', middlewareAuth.ensureAuth, enterpriseController.deleteEnterprise);
 api.put('/updateEnterprise/:id', middlewareAuth.ensureAuth, enterpriseController.updateEnterprise);
 
@@ -22,4 +22,11 @@ api.get('/employeesTotal/:id', middlewareAuth.ensureAuth, enterpriseController.e
 api.get('/login', enterpriseController.login);
 api.get('/pruebaMiddleWare', middlewareAuth.ensureAuth,  enterpriseController.pruebaMiddleWare);
 
+// Branches
+api.put('/:id/addBranch', middlewareAuth.ensureAuth, enterpriseController.addBranch);
+api.put('/:idEn/removeBranch/:idBr', middlewareAuth.ensureAuth, enterpriseController.removeBranch);
+api.put('/:idEn/updateBranch/:idBr', middlewareAuth.ensureAuth, enterpriseController.updateBranch);
+
+// Products
+api.put('/:idEn/addProduct', middlewareAuth.ensureAuth, enterpriseController.addProduct);
 module.exports = api;
