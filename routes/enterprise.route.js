@@ -30,6 +30,6 @@ api.put('/:idEn/updateBranch/:idBr', middlewareAuth.ensureAuth, enterpriseContro
 // Products
 api.put('/:id/addProduct', middlewareAuth.ensureAuth, enterpriseController.addProduct);
 api.put('/:idEn/removeProduct/:idPr', middlewareAuth.ensureAuth, enterpriseController.removeProduct);
-api.get('/stockProduct/:id', middlewareAuth.ensureAuth, enterpriseController.stockProduct);
+api.get('/stockProducts/:id', middlewareAuth.ensureAuth, enterpriseController.stockProducts);
 api.get('/searchProduct/:id', middlewareAuth.ensureAuth, enterpriseController.searchProduct);
 module.exports = api;

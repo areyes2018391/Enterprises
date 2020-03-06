@@ -520,31 +520,30 @@ function updateProduct(req, res){
     });
 }
 
-function stockProduct(req, res){
-    const enterpriseId = req.params.id;
+    function stockProducts(req, res){
+        const productId = req.params.id;
 
-    Enterprise.findById(enterpriseId, (err, stockT)=>{
-        if(err){
-            res.status(500).send({message: 'Error en el servidor'});
-        }else if(stockT){
-            res.send({Enterprise: stockT.name, Products: stockT.products.length});
-        }else{
-            res.status(404).send({message: 'No se encontró ningun empleado'})
-        }
-    })  
-}
-function searchProduct (req, res){
-    var enterpriseId = req.params.id;
-    var params = req.body;
+        Product.findById(productId, (err, stockT)=>{
+            if(err){
+                res.status(500).send({message: 'Error en el servidor'});
+            }else if(stockT){
+                res.send({product: stockT.name, quantity: stockT.quantity});
+            }else{
+                res.status(404).send({message: 'No se encontró ningun empleado'})
+            }
+        })  
+    }
+    function searchProduct (req, res){
+        var params = req.body;
 
-    Product.find({$or:[{quantity:params.quantity}, {name:params.name}]}, (err, productFind)=>{
-        if(err){
-            res.status(500).send({message: 'Error en el servidor'});
-        }else if(productFind){
-            res.send({productos: productFind});
-        }
-    })
-}
+        Product.find({$or:[{quantity:params.quantity}, {name:params.name}]}, (err, productFind)=>{
+            if(err){
+                res.status(500).send({message: 'Error en el servidor'});
+            }else if(productFind){
+                res.send({productos: productFind});
+            }
+        })
+    }
 
 
 module.exports ={
@@ -564,6 +563,6 @@ module.exports ={
     addProduct,
     updateProduct,
     removeProduct,
-    stockProduct,
+    stockProducts,
     searchProduct
 }
