@@ -394,8 +394,7 @@ function updateBranch(req, res){
 }
 
 function addProduct(req, res){
-    var enterpriseId = req.params.idEn;
-    var branchId = req.params.idBr;
+    var enterpriseId = req.params.id;
     var params = req.body;
     var product = Product();
     
@@ -453,6 +452,42 @@ function addProduct(req, res){
 
 } 
 
+function updateProduct(req, res){
+    const enterpriseId = req.params.idEn;
+    var branchId = req.params.idBr;
+    var params = req.body;
+
+    Enterprise.findById(enterpriseId, (err, enterpriseOk)=>{
+        if(err){
+            res.status(500).send({message: 'Error en el servidor'});
+        }else if(enterpriseOk){
+           Branch.findByIdAndUpdate(branchId, params,(err, branchUpdated)=>{
+               if(err){
+                res.status(500).status({message: 'Error en el servidor'});
+               }else if(branchUpdated){
+                Enterprise.findOneAndUpdate({_id:enterpriseId, "branches._id":branchId}, 
+                {"branches.$.branchName": params.branchName,
+                "branches.$.branchPhone": params.branchPhone,
+                "branches.$.branchAddress": params.branchAddress },{new:true}, (err, enterpriseUpdated)=>{
+                    if(err){
+                        res.status(500).send({message: 'Error en el servidor'});
+                    }else if(enterpriseUpdated){
+                        res.send({enterprise: enterpriseUpdated});
+                    }else{
+                        res.status(418).send({message: 'No se pudo actualizar la empresa'});
+                    }
+                }
+                );
+               }else{
+                res.status(418).send({message: 'No se pudo actualizar la sucursal'});
+               }
+           })
+        }else{
+            res.status(418).send({message: 'No se encontró la empresa'});
+        }
+    });
+}
+
 
 
 module.exports ={
@@ -469,5 +504,6 @@ module.exports ={
     addBranch,
     removeBranch,
     updateBranch,
-    addProduct
+    addProduct,
+    updateProduct
 }
