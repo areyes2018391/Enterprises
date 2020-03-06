@@ -8,7 +8,7 @@ var branchSchema = Schema({
         branchPhone: Number,
         branchAddress: String,
         
-        branchProducts: [{
+        products: [{
             name: String,
             quantity: Number
         }] 
