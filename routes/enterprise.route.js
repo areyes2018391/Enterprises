@@ -28,5 +28,5 @@ api.put('/:idEn/removeBranch/:idBr', middlewareAuth.ensureAuth, enterpriseContro
 api.put('/:idEn/updateBranch/:idBr', middlewareAuth.ensureAuth, enterpriseController.updateBranch);
 
 // Products
-api.put('/:idEn/addProduct', middlewareAuth.ensureAuth, enterpriseController.addProduct);
+api.put('/:id/addProduct', middlewareAuth.ensureAuth, enterpriseController.addProduct);
 module.exports = api;
